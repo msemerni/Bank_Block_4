@@ -12,27 +12,55 @@
 // Подсчитать общее количество денег внутри банка в долларовом эквиваленте учитывая кредитные лимиты и снятие средств. 
 // Посчитать сколько всего денег в долларовом эквиваленте все клиенты должны банку. 
 // Посчитать сколько неактивных клиентов должны погасить кредит банку и на какую общую сумму. 
-// Аналогично для активных. Для получения актуальных курсов валют использовать API (которое будет предоставлено). 
+// Аналогично для активных. Для получения актуальных курсов валют использовать API (https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5). 
 // Промисы использовать для работы с API в целях отправки запросов на сервер.
 // Создать отдельный git-репозиторий для этого проекта и дальше работать с этим проектом в этом репозитории.
 
 
 class Client {
-    constructor() {
-      this.firstName = firstName;
-      this.lastName = lastName;
-      this.patronymicName = patronymicName;
-      this.isActive = isActive;
-      this.registrationDate = registrationDate;
+  static id = 1;
+  constructor(fullName, isActive, registrationDate, debitAccount, creditAccount) {
+    this.id = Client.id++;
+    this.fullName = fullName;
+    this.isActive = isActive;
+    this.registrationDate = registrationDate;
+    this.debitAccount = {};
+    this.creditAccount = {};
+  }
+    addDebitAccount(balance, isActive, activityDate, expiredDate, currencyType) {
 
     }
+  
 }
+
+
 
 class Account {
-    constructor() {
-        this.debitAccount = debitAccount;
-        this.creditAccount = creditAccount;
-
-    }
+  constructor(debitAccount, creditAccount) {
+    this.debitAccount = debitAccount;
+    this.creditAccount = creditAccount;
+  }
 }
 
+
+
+let q1 = new Client("Misha", true, "21.02.2022", 25, 38);
+let q2 = new Client("Ira", false, "15.01.2020");
+let q3 = new Client("Valera", false, "08.02.2021");
+let q4 = new Client("Nadya", true, "05.08.2019");
+console.log(q1);
+console.log(q2);
+console.log(q3);
+console.log(q4);
+
+let clientBase = [];
+function addClientToBank (client) {
+  clientBase.push(client);
+}
+
+addClientToBank(q1);
+addClientToBank(q2);
+addClientToBank(q3);
+addClientToBank(q4);
+
+console.log(clientBase);
