@@ -27,37 +27,73 @@ class Client {
     this.fullName = fullName;
     this.isActive = isActive;
     this.registrationDate = registrationDate;
+    this.debitAccounts = [];
+    this.creditAccounts = [];
     Client.clientBase.push(this);
   }
 
-  addDebitAccount(balance, expiredDate, currencyType) {
-    this.debitAccount = {
-      isActive: true,
-      balance: balance,
-      expiredDate: expiredDate,
-      currencyType: currencyType
+  addDebitAccount(debitBalance, expiredDate, currencyType) {
+    if (debitBalance >= 0) {
+      this.debitAccounts.push({
+        isActive: true,
+        debitBalance: debitBalance,
+        expiredDate: expiredDate,
+        currencyType: currencyType
+      })
+    } else {
+      throw new Error("Balance should be >= 0")
     }
   }
 
-  addCreditAccount(ownBalance, creditBalance, creditLimit, expiredDate, currencyType) {
-    this.creditAccount = {
-      isActive: true,
-      ownBalance: ownBalance,
-      creditBalance: creditBalance,
-      creditLimit: creditLimit,
-      expiredDate: expiredDate,
-      currencyType: currencyType
+  addCreditAccount(creditLimit, expiredDate, currencyType) {
+    if (creditLimit >= 0) {
+      this.creditAccounts.push({
+        isActive: true,
+        creditBalance: creditLimit,
+        creditLimit: creditLimit,
+        expiredDate: expiredDate,
+        currencyType: currencyType
+      })
+    } else {
+      throw new Error("Limit should be >= 0");
     }
   }
 }
 
 let misha = new Client("Misha", true, new Date(2011, 0, 1));
 misha.addDebitAccount(1000, new Date(2022, 11, 31), "UAH");
-misha.addCreditAccount(500, 2000, 5000, new Date(2022, 8, 5), "USD");
+misha.addDebitAccount(7000, new Date(2024, 7, 15), "EUR");
+misha.addCreditAccount(6000, new Date(2025, 8, 5), "UAH");
+misha.addCreditAccount(5000, new Date(2022, 8, 5), "USD");
 
 let ira = new Client("Ira", false, new Date(2020, 7, 9));
 ira.addDebitAccount(2000, new Date(2022, 5, 20), "USD");
+ira.addDebitAccount(6000, new Date(2023, 6, 20), "EUR");
 
 console.log(misha);
 console.log(ira);
 console.log(Client.clientBase);
+console.log(misha.debitAccounts[0].currencyType);
+
+ira.isActive = true;
+console.log(ira);
+
+
+function getCurrencyRates() {
+  let currencyRates = fetch("https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5")
+  .then(response => response.json())
+  // .then(data => console.log(data));
+  return currencyRates;
+}
+
+function getBankUSDAmount() {
+  getCurrencyRates()
+    .then(rates => {
+      Client.clientBase.map(client => 
+        console.log(client.fullName, rates[0].buy, rates))
+        
+    })
+
+}
+
+getBankUSDAmount();
