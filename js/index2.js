@@ -12,55 +12,52 @@
 // Подсчитать общее количество денег внутри банка в долларовом эквиваленте учитывая кредитные лимиты и снятие средств. 
 // Посчитать сколько всего денег в долларовом эквиваленте все клиенты должны банку. 
 // Посчитать сколько неактивных клиентов должны погасить кредит банку и на какую общую сумму. 
-// Аналогично для активных. Для получения актуальных курсов валют использовать API (https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5). 
+// Аналогично для активных. 
+// Для получения актуальных курсов валют использовать API (https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5). 
 // Промисы использовать для работы с API в целях отправки запросов на сервер.
 // Создать отдельный git-репозиторий для этого проекта и дальше работать с этим проектом в этом репозитории.
 
 
 class Client {
   static id = 1;
-  constructor(fullName, isActive, registrationDate, debitAccount, creditAccount) {
+  static clientBase = [];
+
+  constructor(fullName, isActive, registrationDate) {
     this.id = Client.id++;
     this.fullName = fullName;
     this.isActive = isActive;
     this.registrationDate = registrationDate;
-    this.debitAccount = {};
-    this.creditAccount = {};
+    Client.clientBase.push(this);
   }
-    addDebitAccount(balance, isActive, activityDate, expiredDate, currencyType) {
 
+  addDebitAccount(balance, expiredDate, currencyType) {
+    this.debitAccount = {
+      isActive: true,
+      balance: balance,
+      expiredDate: expiredDate,
+      currencyType: currencyType
     }
-  
-}
+  }
 
-
-
-class Account {
-  constructor(debitAccount, creditAccount) {
-    this.debitAccount = debitAccount;
-    this.creditAccount = creditAccount;
+  addCreditAccount(ownBalance, creditBalance, creditLimit, expiredDate, currencyType) {
+    this.creditAccount = {
+      isActive: true,
+      ownBalance: ownBalance,
+      creditBalance: creditBalance,
+      creditLimit: creditLimit,
+      expiredDate: expiredDate,
+      currencyType: currencyType
+    }
   }
 }
 
+let misha = new Client("Misha", true, new Date(2011, 0, 1));
+misha.addDebitAccount(1000, new Date(2022, 11, 31), "UAH");
+misha.addCreditAccount(500, 2000, 5000, new Date(2022, 8, 5), "USD");
 
+let ira = new Client("Ira", false, new Date(2020, 7, 9));
+ira.addDebitAccount(2000, new Date(2022, 5, 20), "USD");
 
-let q1 = new Client("Misha", true, "21.02.2022", 25, 38);
-let q2 = new Client("Ira", false, "15.01.2020");
-let q3 = new Client("Valera", false, "08.02.2021");
-let q4 = new Client("Nadya", true, "05.08.2019");
-console.log(q1);
-console.log(q2);
-console.log(q3);
-console.log(q4);
-
-let clientBase = [];
-function addClientToBank (client) {
-  clientBase.push(client);
-}
-
-addClientToBank(q1);
-addClientToBank(q2);
-addClientToBank(q3);
-addClientToBank(q4);
-
-console.log(clientBase);
+console.log(misha);
+console.log(ira);
+console.log(Client.clientBase);
