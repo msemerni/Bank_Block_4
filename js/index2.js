@@ -61,14 +61,20 @@ class Client {
 }
 
 let misha = new Client("Misha", true, new Date(2011, 0, 1));
-misha.addDebitAccount(1000, new Date(2022, 11, 31), "UAH");
-misha.addDebitAccount(7000, new Date(2024, 7, 15), "EUR");
-misha.addCreditAccount(6000, new Date(2025, 8, 5), "UAH");
-misha.addCreditAccount(5000, new Date(2022, 8, 5), "USD");
+misha.addDebitAccount(100, new Date(2022, 11, 31), "UAH");
+misha.addDebitAccount(200, new Date(2024, 7, 15), "EUR");
+
+misha.addCreditAccount(3000, new Date(2025, 8, 5), "UAH");
+misha.addCreditAccount(400, new Date(2022, 8, 5), "USD");
+
+
 
 let ira = new Client("Ira", false, new Date(2020, 7, 9));
-ira.addDebitAccount(2000, new Date(2022, 5, 20), "USD");
-ira.addDebitAccount(6000, new Date(2023, 6, 20), "EUR");
+ira.addDebitAccount(500, new Date(2022, 5, 20), "USD");
+ira.addDebitAccount(600, new Date(2023, 6, 25), "EUR");
+
+ira.addCreditAccount(8000, new Date(2026, 4, 2), "UAH");
+
 
 console.log(misha);
 console.log(ira);
@@ -76,24 +82,45 @@ console.log(Client.clientBase);
 console.log(misha.debitAccounts[0].currencyType);
 
 ira.isActive = true;
-console.log(ira);
+// console.log(ira);
 
 
-function getCurrencyRates() {
-  let currencyRates = fetch("https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5")
+async function getCurrencyRates() {
+  let currencyRates = await fetch("https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5")
   .then(response => response.json())
   // .then(data => console.log(data));
   return currencyRates;
 }
 
+
+
 function getBankUSDAmount() {
+  let sumUSD = 0;
+
   getCurrencyRates()
     .then(rates => {
-      Client.clientBase.map(client => 
-        console.log(client.fullName, rates[0].buy, rates))
-        
-    })
+      console.log(rates);
+      Client.clientBase.map(client => {
+        // console.log(client);
+        client.creditAccounts.map(creditBal => {
+          console.log(creditBal.currencyType);
+          if (creditBal.currencyType) {
 
+          }
+
+          sumUSD += creditBal.creditBalance;
+
+        });
+
+
+
+      })
+      console.log(sumUSD);
+    }
+
+    )
 }
+
+
 
 getBankUSDAmount();
