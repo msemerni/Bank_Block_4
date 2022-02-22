@@ -12,7 +12,7 @@
 // 1. Подсчитать общее количество денег внутри банка в долларовом эквиваленте учитывая кредитные лимиты и снятие средств. 
 // 2. Посчитать сколько всего денег в долларовом эквиваленте все клиенты должны банку. 
 // 3. Посчитать сколько неактивных клиентов должны погасить кредит банку и на какую общую сумму. 
-// 3b. Аналогично для активных. 
+// 4. Аналогично для активных. 
 
 // Для получения актуальных курсов валют использовать API (https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5). 
 // Промисы использовать для работы с API в целях отправки запросов на сервер.
@@ -41,7 +41,7 @@ class Client {
         currencyType: currencyType,
       })
     } else {
-      throw new Error("Balance should be >= 0")
+      throw new Error("Balance should be >= 0");
     }
   }
 
@@ -72,57 +72,45 @@ class Client {
 
 function getCurrencyRates() {
   let currencyRates = fetch("https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5")
-    .then(response => response.json());
+    .then(response => response.json())
+    .then(rates => {
+      let exchangeRates = {};
+
+      for(let i = 0; i < rates.length; i++) {
+        exchangeRates[rates[i].ccy] = +rates[i].sale;
+      }
+      exchangeRates["UAH"] = 1;
+      return exchangeRates;
+    })
   return currencyRates;
 }
 
 function getBankUSDAmount() {
-  let sumUSD = 0;
-
   getCurrencyRates()
-    .then(rates => {
+    .then(currencyRates => {
+      let sumUSD = 0;
       Client.clientBase.map(client => {
-        client.creditAccounts.map(creditAccounts => {
-          let usdRate;
-
-          for(let i = 0; i < rates.length; i++) {
-            if(rates[i].ccy === "USD") {
-              usdRate = rates[i].sale;
+        if(client.creditAccounts.length > 0) {
+          client.creditAccounts.map(creditAccounts => {
+            sumUSD += ((creditAccounts.creditBalance * currencyRates[creditAccounts.currencyType]) / currencyRates["USD"]);
+            if(isNaN(sumUSD)) {
+              throw new Error (`No currency rate for ${creditAccounts.currencyType}`);
             }
+          });
+        }
 
-            if(creditAccounts.currencyType === "UAH") {
-              sumUSD += (creditAccounts.creditBalance / usdRate);
-              return;
+        if(client.debitAccounts.length > 0) {
+          client.debitAccounts.map(debitAccounts => {
+            sumUSD += ((debitAccounts.debitBalance * currencyRates[debitAccounts.currencyType]) / currencyRates["USD"]);
+            if(isNaN(sumUSD)) {
+              throw new Error (`No currency rate for ${debitAccounts.currencyType}`);
             }
-
-            if(creditAccounts.currencyType === rates[i].ccy) {
-              sumUSD += (creditAccounts.creditBalance * (rates[i].sale / usdRate));
-            }
-          }
-        });
-
-        client.debitAccounts.map(debitAccounts => {
-          let usdRate;
-
-          for(let i = 0; i < rates.length; i++) {
-            if(rates[i].ccy === "USD") {
-              usdRate = rates[i].sale;
-            }
-
-            if(debitAccounts.currencyType === "UAH") {
-              sumUSD += (debitAccounts.debitBalance / usdRate);
-              return;
-            }
-
-            if(debitAccounts.currencyType === rates[i].ccy) {
-              sumUSD += (debitAccounts.debitBalance * (rates[i].sale / usdRate));
-            }
-          }
-        });
+          });
+        }
       });
       // console.log("Total USD in Bank: " + sumUSD);
       return sumUSD;
-    });
+    })
 }
 
 getBankUSDAmount();

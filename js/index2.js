@@ -42,7 +42,7 @@ class Client {
         currencyType: currencyType,
       })
     } else {
-      throw new Error("Balance should be >= 0")
+      throw new Error("Balance should be >= 0");
     }
   }
 
@@ -74,9 +74,9 @@ misha.addCreditAccount(100, new Date(2022, 8, 5), "USD");
 
 let ira = new Client("Ira", false, new Date(2020, 7, 9));
 ira.addDebitAccount(500, new Date(2022, 5, 20), "USD");
-// ira.addDebitAccount(600, new Date(2023, 6, 25), "EUR");
-
 ira.addCreditAccount(200, new Date(2026, 4, 2), "EUR");
+
+// ira.addDebitAccount(600, new Date(2023, 6, 25), "EUR");
 // ira.creditAccounts[0].creditBalance -= 150;
 
 console.log(misha);
@@ -87,86 +87,176 @@ console.log(misha.debitAccounts[0].currencyType);
 ira.isActive = true;
 // console.log(ira);
 
-
 function getCurrencyRates() {
-  let currencyRates = fetch("https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5")
-  .then(response => response.json());
-  // .then(data => console.log(data));
-  return currencyRates;
+  let currencyUsdRates = fetch("https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5")
+    .then(response => response.json())
+    .then(rates => {
+      let exchangeRates = {};
+      console.log(rates);
+      
+      for (let i = 0; i < rates.length; i++) {
+        exchangeRates[rates[i].ccy] = +rates[i].sale;
+        console.log(exchangeRates);
+      }
+      exchangeRates["UAH"] = 1;
+
+      return exchangeRates;
+    })
+  return currencyUsdRates;
 }
 
+// function getCurrencyRates() {
+//   let currencyUsdRates = fetch("https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5")
+//     .then(response => response.json())
+//     .then(rates => {
+//       let exchangeRates = {};
+//       let usdSale;
+//       console.log(rates);
+//       for (let i = 0; i < rates.length; i++) {
+//         if (rates[i].ccy === "USD") {
+//           usdSale = rates[i].sale;
+//           console.log(usdSale);
+//         }
+//         exchangeRates[rates[i].ccy] = rates[i].sale;
+//         console.log(exchangeRates);
+//       }
+//       for (let i = 0; i < rates.length; i++) {
+//         exchangeRates[rates[i].ccy] = usdSale / rates[i].sale;
+//         console.log(exchangeRates);
+//       }
+//       exchangeRates["UAH"] = +usdSale;
 
+//       return exchangeRates;
+//     })
+//   return currencyUsdRates;
+// }
+
+// function getCurrencyRates() {
+//   let usdRate = fetch("https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5")
+//     .then(response => response.json())
+//     .then(rates => {
+//       let exchangeRates;
+//       console.log(rates);
+//       for (let i = 0; i < rates.length; i++) {
+//         if (rates[i].ccy === "USD") {
+//           exchangeRates = rates[i].sale;
+//           console.log(exchangeRates + " USD SALE");
+//         }
+
+//       }
+//       return exchangeRates;
+//     })
+//   return usdRate;
+// }
+
+// ////// first variant
+// function getBankUSDAmount() {
+//   let sumUSD = 0;
+
+//   getCurrencyRates()
+//     .then(rates => {
+//       console.log(rates);
+//       Client.clientBase.map(client => {
+//         // console.log(client);
+
+//         client.creditAccounts.map(creditAccounts => {
+//           // console.log(creditBal.currencyType);
+//           let usdRate;
+
+//           for (let i = 0; i < rates.length; i++) {
+//             if (rates[i].ccy === "USD") {
+//               usdRate = rates[i].sale;
+//               console.log(usdRate + " USD SALE");
+//             }
+
+//             if (creditAccounts.currencyType === "UAH") {
+//               sumUSD += (creditAccounts.creditBalance / usdRate);
+//               console.log(sumUSD + " UAH to USD");
+//               return;
+//             }
+
+//             if (creditAccounts.currencyType === rates[i].ccy) {
+//               // console.log(rates[i].ccy + "rate" + rates[i].sale);
+//               console.log(creditAccounts);
+//               sumUSD += (creditAccounts.creditBalance * (rates[i].sale / usdRate));
+//               console.log(rates[i].ccy + " TO usd: " + rates[i].sale / usdRate);
+//             }
+//           }
+//         });
+
+//         client.debitAccounts.map(debitAccounts => {
+//           // console.log(creditBal.currencyType);
+//           let usdRate;
+
+//           for (let i = 0; i < rates.length; i++) {
+//             if (rates[i].ccy === "USD") {
+//               usdRate = rates[i].sale;
+//               console.log(usdRate + " USD SALE");
+//             }
+
+//             if (debitAccounts.currencyType === "UAH") {
+//               sumUSD += (debitAccounts.debitBalance / usdRate);
+//               console.log(sumUSD + " UAH to USD");
+//               return;
+//             }
+
+//             if (debitAccounts.currencyType === rates[i].ccy) {
+//               // console.log(rates[i].ccy + "rate" + rates[i].sale);
+//               console.log(debitAccounts);
+//               sumUSD += (debitAccounts.debitBalance * (rates[i].sale / usdRate));
+//               console.log(rates[i].ccy + " TO usd: " + rates[i].sale / usdRate);
+//             }
+//           }
+//         });
+//       })
+
+//       console.log("Total USD in Bank: " + sumUSD);
+//       return sumUSD;
+//     }
+//     )
+// }
+
+/////////////////////////////
+
+////// second variant
 function getBankUSDAmount() {
-  let sumUSD = 0;
+
 
   getCurrencyRates()
-    .then(rates => {
-      console.log(rates);
+    .then(currencyUsdRates => {
+      let sumUSD = 0;
+      console.log(currencyUsdRates);
       Client.clientBase.map(client => {
-        // console.log(client);
-        
-        client.creditAccounts.map(creditAccounts => {
-          // console.log(creditBal.currencyType);
-          let usdRate;
 
-          for (let i = 0; i < rates.length; i++) {
-            if (rates[i].ccy === "USD") {
-              usdRate = rates[i].sale;
-              console.log(usdRate + " USD SALE");
+        if (client.creditAccounts.length > 0) {
+          client.creditAccounts.map(creditAccounts => {
+            sumUSD += ((creditAccounts.creditBalance * currencyUsdRates[creditAccounts.currencyType]) / currencyUsdRates["USD"]);
+            if(isNaN(sumUSD)) {
+              throw new Error (`No currency rate for ${creditAccounts.currencyType}`);
             }
+            console.log(sumUSD + " to USD");
+          });
+        }
 
-            if (creditAccounts.currencyType === "UAH") {
-              sumUSD += (creditAccounts.creditBalance / usdRate);
-              console.log(sumUSD + " UAH to USD");
-              return;
+        if (client.debitAccounts.length > 0) {
+
+          client.debitAccounts.map(debitAccounts => {
+            sumUSD += ((debitAccounts.debitBalance * currencyUsdRates[debitAccounts.currencyType]) / currencyUsdRates["USD"]);
+            if(isNaN(sumUSD)) {
+              throw new Error (`No currency rate for ${debitAccounts.currencyType}`);
             }
-
-            if (creditAccounts.currencyType === rates[i].ccy) {
-              // console.log(rates[i].ccy + "rate" + rates[i].sale);
-              console.log(creditAccounts);
-              sumUSD += (creditAccounts.creditBalance * (rates[i].sale / usdRate));
-              console.log(rates[i].ccy + " TO usd: " + rates[i].sale / usdRate);
-            }
-          }
-        });
-//////////////////////
-
-        client.debitAccounts.map(debitAccounts => {
-          // console.log(creditBal.currencyType);
-          let usdRate;
-
-          for (let i = 0; i < rates.length; i++) {
-            if (rates[i].ccy === "USD") {
-              usdRate = rates[i].sale;
-              console.log(usdRate + " USD SALE");
-            }
-
-            if (debitAccounts.currencyType === "UAH") {
-              sumUSD += (debitAccounts.debitBalance / usdRate);
-              console.log(sumUSD + " UAH to USD");
-              return;
-            }
-
-            if (debitAccounts.currencyType === rates[i].ccy) {
-              // console.log(rates[i].ccy + "rate" + rates[i].sale);
-              console.log(debitAccounts);
-              sumUSD += (debitAccounts.debitBalance * (rates[i].sale / usdRate));
-              console.log(rates[i].ccy + " TO usd: " + rates[i].sale / usdRate);
-            }
-          }
-        });
-
-/////////////////////
+            console.log(sumUSD + " to USD");
+          });
+        }
 
 
-
-      });
+      })
 
       console.log("Total USD in Bank: " + sumUSD);
       return sumUSD;
-    });
+    }
+    )
 }
-
 
 
 let dd = getBankUSDAmount();
