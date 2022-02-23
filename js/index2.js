@@ -253,22 +253,47 @@ function getCurrencyRates() {
 //     )
 // }
 ////// third variant
+// function getBankUsdAmount() {
+//   getCurrencyRates()
+//     .then(currencyRates => {
+//       let sumUSD = 0;
+//       let totalBankMoney = [];
+//       Client.clientBase.map(client => {
+//         totalBankMoney.push(client.creditAccounts, client.debitAccounts);
+//       });
+
+//       let allBankMoney = [].concat(...totalBankMoney);
+
+//       for(let i = 0; i < allBankMoney.length; i++) {
+//         sumUSD += allBankMoney[i].creditBalance * currencyRates[allBankMoney[i].currencyType] / currencyRates["USD"] ||
+//           allBankMoney[i].debitBalance * currencyRates[allBankMoney[i].currencyType] / currencyRates["USD"];
+//       }
+//       console.log(allBankMoney);
+//       console.log("Total USD in Bank: " + sumUSD);
+//       return sumUSD;
+//     })
+// }
+
+////// fourth variant
 function getBankUsdAmount() {
   getCurrencyRates()
     .then(currencyRates => {
       let sumUSD = 0;
       let totalBankMoney = [];
       Client.clientBase.map(client => {
-        totalBankMoney.push(client.creditAccounts, client.debitAccounts);
+        client.creditAccounts.map(element => { totalBankMoney.push(element) });
+        client.debitAccounts.map(element => { totalBankMoney.push(element) });
       });
 
-      let allBankMoney = [].concat(...totalBankMoney);
+      console.log(totalBankMoney);
 
-      for(let i = 0; i < allBankMoney.length; i++) {
-        sumUSD += allBankMoney[i].creditBalance * currencyRates[allBankMoney[i].currencyType] / currencyRates["USD"] ||
-          allBankMoney[i].debitBalance * currencyRates[allBankMoney[i].currencyType] / currencyRates["USD"];
+      // let allBankMoney = [].concat(...totalBankMoney);
+      // console.log(allBankMoney);
+
+      for(let i = 0; i < totalBankMoney.length; i++) {
+        sumUSD += totalBankMoney[i].creditBalance * currencyRates[totalBankMoney[i].currencyType] / currencyRates["USD"] ||
+          totalBankMoney[i].debitBalance * currencyRates[totalBankMoney[i].currencyType] / currencyRates["USD"];
       }
-      console.log(allBankMoney);
       console.log("Total USD in Bank: " + sumUSD);
       return sumUSD;
     })
@@ -277,19 +302,44 @@ function getBankUsdAmount() {
 getBankUsdAmount();
 
 
-
+////2. Посчитать сколько всего денег в долларовом эквиваленте все клиенты должны банку. 
 // 50S 100E
 
+////// first variant
+// function getClientsDebt () {
+//   getCurrencyRates()
+//     .then(currencyRates => {
+//       let debtsSum = 0;
+//       let totalCreditAccounts = [];
+//       Client.clientBase.map(client => {
+//         totalCreditAccounts.push(client.creditAccounts);
+//       });
+
+//       let allCreditAccounts = [].concat(...totalCreditAccounts);
+ 
+
+//       for(let i = 0; i < allCreditAccounts.length; i++) {
+//         debtsSum += (allCreditAccounts[i].creditLimit - allCreditAccounts[i].creditBalance) * currencyRates[allCreditAccounts[i].currencyType] / currencyRates["USD"];
+//       }
+
+//       console.log("Total Debts: " + debtsSum);
+//       return debtsSum;
+
+//     })
+
+// }
+
+//// second variant
 function getClientsDebt () {
   getCurrencyRates()
     .then(currencyRates => {
       let debtsSum = 0;
-      let totalCreditAccounts = [];
+      let allCreditAccounts = [];
       Client.clientBase.map(client => {
-        totalCreditAccounts.push(client.creditAccounts);
+        client.creditAccounts.map(element => { allCreditAccounts.push(element) });
       });
 
-      let allCreditAccounts = [].concat(...totalCreditAccounts);
+      // let allCreditAccounts = [].concat(...totalCreditAccounts);
  
 
       for(let i = 0; i < allCreditAccounts.length; i++) {
@@ -305,26 +355,62 @@ function getClientsDebt () {
 
 getClientsDebt();
 
-// 3. Посчитать сколько неактивных клиентов должны погасить кредит банку и на какую общую сумму. 
-// 3a. Аналогично для активных. 
+// // 3. Посчитать сколько неактивных клиентов должны погасить кредит банку и на какую общую сумму. 
+// // 3a. Аналогично для активных. 
 
+//// first variant
+// function getCreditors(isActiveStatus) {
+//   getCurrencyRates()
+//     .then(currencyRates => {
+//       let clientsDebtsSum = 0;
+//       let totalCreditAccounts = [];
+//       let allCreditors = {};
+//       Client.clientBase.map(client => {
+//         if(client.isActive === isActiveStatus){
+//           totalCreditAccounts.push(client.creditAccounts);
+//         }
+//       });
+//       let allCreditAccounts = [].concat(...totalCreditAccounts);
+       
+//       for(let i = 0; i < allCreditAccounts.length; i++) {
+//         clientsDebtsSum += (allCreditAccounts[i].creditLimit - allCreditAccounts[i].creditBalance) * currencyRates[allCreditAccounts[i].currencyType] / currencyRates["USD"];
+//       }
+//       allCreditors.CreditorsCount = totalCreditAccounts.length;
+//       allCreditors.TotalDebts = clientsDebtsSum;
+
+//       console.log(allCreditors);
+//       return allCreditors;
+//     })
+// }
+
+// getCreditors(false);
+
+// second variant
 function getCreditors(isActiveStatus) {
   getCurrencyRates()
     .then(currencyRates => {
       let clientsDebtsSum = 0;
-      let totalCreditAccounts = [];
+      let allCreditAccounts = [];
       let allCreditors = {};
       Client.clientBase.map(client => {
         if(client.isActive === isActiveStatus){
-          totalCreditAccounts.push(client.creditAccounts);
+          client.creditAccounts.map(element => { 
+            if(element.creditBalance < element.creditLimit){
+            allCreditAccounts.push(element) }
+          });
         }
+
+        
       });
-      let allCreditAccounts = [].concat(...totalCreditAccounts);
-       
+
+      console.log(allCreditAccounts);
+
+
+      
       for(let i = 0; i < allCreditAccounts.length; i++) {
         clientsDebtsSum += (allCreditAccounts[i].creditLimit - allCreditAccounts[i].creditBalance) * currencyRates[allCreditAccounts[i].currencyType] / currencyRates["USD"];
       }
-      allCreditors.CreditorsCount = totalCreditAccounts.length;
+      allCreditors.CreditorsCount = allCreditAccounts.length;
       allCreditors.TotalDebts = clientsDebtsSum;
 
       console.log(allCreditors);
@@ -332,4 +418,4 @@ function getCreditors(isActiveStatus) {
     })
 }
 
-getCreditors(false);
+getCreditors(true);
