@@ -33,7 +33,7 @@ class Client {
 
   addDebitAccount(balance, expiredDate, currencyType) {
     if(balance < 0) {
-      throw new Error("Balance should be >= 0");
+      throw ("Balance should be more zero");
     }
     this.accounts.push({
       accountType: 'debitAccount',
@@ -46,7 +46,7 @@ class Client {
 
   addCreditAccount(creditLimit, expiredDate, currencyType) {
     if(creditLimit < 0) {
-      throw new Error("Limit should be >= 0");
+      throw ("Limit should be more zero");
     }
     this.accounts.push({
       accountType: 'creditAccount',
@@ -79,9 +79,46 @@ function getBankUsdAmount() {
   getCurrencyRates()
     .then(currencyRates => {
       let sumUSD = 0;
-      Client.clientBase.map(client => { client.accounts.map(element => 
-        {sumUSD += element.balance * currencyRates[element.currencyType] / currencyRates["USD"] }) 
+      Client.clientBase.map(client => {
+        client.accounts.map(account => {
+          sumUSD += account.balance * currencyRates[account.currencyType] / currencyRates["USD"];
+        });
       });
       return sumUSD;
+    })
+}
+
+function getClientsDebt() {
+  getCurrencyRates()
+    .then(currencyRates => {
+      let debtsSum = 0;
+      Client.clientBase.map(client => {
+        client.accounts.map(account => {
+          if(account.accountType === "creditAccount") {
+            debtsSum += (account.creditLimit - account.balance) * currencyRates[account.currencyType] / currencyRates["USD"];
+          }
+        });
+      });
+      return debtsSum;
+    })
+}
+
+function getCreditors(isActiveStatus) {
+  getCurrencyRates()
+    .then(currencyRates => {
+      let allCreditors = {
+        CreditorsCount: 0,
+        TotalDebts: 0,
+      };
+
+      Client.clientBase.map(client => {
+        client.accounts.map(account => {
+          if(account.accountType === "creditAccount" && account.balance < account.creditLimit && client.isActive === isActiveStatus) {
+            allCreditors.TotalDebts += (account.creditLimit - account.balance) * currencyRates[account.currencyType] / currencyRates["USD"];
+            allCreditors.CreditorsCount++;
+          }
+        });
+      });
+      return allCreditors;
     })
 }
