@@ -66,13 +66,13 @@ misha.addDebitAccount(1000, new Date(2022, 11, 31), "UAH");
 misha.addDebitAccount(200, new Date(2024, 7, 15), "EUR");
 misha.addCreditAccount(3500, new Date(2025, 8, 5), "UAH");
 misha.addCreditAccount(100, new Date(2022, 8, 5), "USD");
-misha.creditAccounts[1].creditBalance -= 50;
+// misha.creditAccounts[1].creditBalance -= 50;
 misha.isActive = false;
 
 let ira = new Client("Ira", false, new Date(2020, 7, 9));
 ira.addDebitAccount(500, new Date(2022, 5, 20), "USD");
 ira.addCreditAccount(200, new Date(2026, 4, 2), "EUR");
-ira.creditAccounts[0].creditBalance -= 100;
+// ira.creditAccounts[0].creditBalance -= 100;
 
 console.log(misha);
 console.log(ira);
@@ -275,26 +275,40 @@ function getCurrencyRates() {
 // }
 
 ////// fourth variant
+// function getBankUsdAmount() {
+//   getCurrencyRates()
+//     .then(currencyRates => {
+//       let sumUSD = 0;
+//       let totalBankMoney = [];
+//       Client.clientBase.map(client => {
+//         client.creditAccounts.map(element => { totalBankMoney.push(element) });
+//         client.debitAccounts.map(element => { totalBankMoney.push(element) });
+//       });
+
+//       console.log(totalBankMoney);
+
+//       // let allBankMoney = [].concat(...totalBankMoney);
+//       // console.log(allBankMoney);
+
+//       for (let i = 0; i < totalBankMoney.length; i++) {
+//         sumUSD += totalBankMoney[i].creditBalance * currencyRates[totalBankMoney[i].currencyType] / currencyRates["USD"] ||
+//           totalBankMoney[i].debitBalance * currencyRates[totalBankMoney[i].currencyType] / currencyRates["USD"];
+//       }
+//       console.log("Total USD in Bank: " + sumUSD);
+//       return sumUSD;
+//     })
+// }
+
+////// fifth variant
 function getBankUsdAmount() {
   getCurrencyRates()
     .then(currencyRates => {
       let sumUSD = 0;
-      let totalBankMoney = [];
       Client.clientBase.map(client => {
-        client.creditAccounts.map(element => { totalBankMoney.push(element) });
-        client.debitAccounts.map(element => { totalBankMoney.push(element) });
+        client.creditAccounts.map(element => { sumUSD += element.creditBalance * currencyRates[element.currencyType] / currencyRates["USD"] });
+        client.debitAccounts.map(element => { sumUSD += element.debitBalance * currencyRates[element.currencyType] / currencyRates["USD"] });
       });
-
-      console.log(totalBankMoney);
-
-      // let allBankMoney = [].concat(...totalBankMoney);
-      // console.log(allBankMoney);
-
-      for(let i = 0; i < totalBankMoney.length; i++) {
-        sumUSD += totalBankMoney[i].creditBalance * currencyRates[totalBankMoney[i].currencyType] / currencyRates["USD"] ||
-          totalBankMoney[i].debitBalance * currencyRates[totalBankMoney[i].currencyType] / currencyRates["USD"];
-      }
-      console.log("Total USD in Bank: " + sumUSD);
+      console.log(sumUSD)
       return sumUSD;
     })
 }
@@ -302,23 +316,47 @@ function getBankUsdAmount() {
 getBankUsdAmount();
 
 
-////2. Посчитать сколько всего денег в долларовом эквиваленте все клиенты должны банку. 
-// 50S 100E
+// ////2. Посчитать сколько всего денег в долларовом эквиваленте все клиенты должны банку. 
+// // 50S 100E
 
-////// first variant
-// function getClientsDebt () {
+// ////// first variant
+// // function getClientsDebt () {
+// //   getCurrencyRates()
+// //     .then(currencyRates => {
+// //       let debtsSum = 0;
+// //       let totalCreditAccounts = [];
+// //       Client.clientBase.map(client => {
+// //         totalCreditAccounts.push(client.creditAccounts);
+// //       });
+
+// //       let allCreditAccounts = [].concat(...totalCreditAccounts);
+ 
+
+// //       for(let i = 0; i < allCreditAccounts.length; i++) {
+// //         debtsSum += (allCreditAccounts[i].creditLimit - allCreditAccounts[i].creditBalance) * currencyRates[allCreditAccounts[i].currencyType] / currencyRates["USD"];
+// //       }
+
+// //       console.log("Total Debts: " + debtsSum);
+// //       return debtsSum;
+
+// //     })
+
+// // }
+
+// //// second variant
+// function getClientsDebt() {
 //   getCurrencyRates()
 //     .then(currencyRates => {
 //       let debtsSum = 0;
-//       let totalCreditAccounts = [];
+//       let allCreditAccounts = [];
 //       Client.clientBase.map(client => {
-//         totalCreditAccounts.push(client.creditAccounts);
+//         client.creditAccounts.map(element => { allCreditAccounts.push(element) });
 //       });
 
-//       let allCreditAccounts = [].concat(...totalCreditAccounts);
- 
+//       // let allCreditAccounts = [].concat(...totalCreditAccounts);
 
-//       for(let i = 0; i < allCreditAccounts.length; i++) {
+
+//       for (let i = 0; i < allCreditAccounts.length; i++) {
 //         debtsSum += (allCreditAccounts[i].creditLimit - allCreditAccounts[i].creditBalance) * currencyRates[allCreditAccounts[i].currencyType] / currencyRates["USD"];
 //       }
 
@@ -329,53 +367,65 @@ getBankUsdAmount();
 
 // }
 
-//// second variant
-function getClientsDebt () {
-  getCurrencyRates()
-    .then(currencyRates => {
-      let debtsSum = 0;
-      let allCreditAccounts = [];
-      Client.clientBase.map(client => {
-        client.creditAccounts.map(element => { allCreditAccounts.push(element) });
-      });
+// getClientsDebt();
 
-      // let allCreditAccounts = [].concat(...totalCreditAccounts);
- 
+// // // 3. Посчитать сколько неактивных клиентов должны погасить кредит банку и на какую общую сумму. 
+// // // 3a. Аналогично для активных. 
 
-      for(let i = 0; i < allCreditAccounts.length; i++) {
-        debtsSum += (allCreditAccounts[i].creditLimit - allCreditAccounts[i].creditBalance) * currencyRates[allCreditAccounts[i].currencyType] / currencyRates["USD"];
-      }
+// //// first variant
+// // function getCreditors(isActiveStatus) {
+// //   getCurrencyRates()
+// //     .then(currencyRates => {
+// //       let clientsDebtsSum = 0;
+// //       let totalCreditAccounts = [];
+// //       let allCreditors = {};
+// //       Client.clientBase.map(client => {
+// //         if(client.isActive === isActiveStatus){
+// //           totalCreditAccounts.push(client.creditAccounts);
+// //         }
+// //       });
+// //       let allCreditAccounts = [].concat(...totalCreditAccounts);
+       
+// //       for(let i = 0; i < allCreditAccounts.length; i++) {
+// //         clientsDebtsSum += (allCreditAccounts[i].creditLimit - allCreditAccounts[i].creditBalance) * currencyRates[allCreditAccounts[i].currencyType] / currencyRates["USD"];
+// //       }
+// //       allCreditors.CreditorsCount = totalCreditAccounts.length;
+// //       allCreditors.TotalDebts = clientsDebtsSum;
 
-      console.log("Total Debts: " + debtsSum);
-      return debtsSum;
+// //       console.log(allCreditors);
+// //       return allCreditors;
+// //     })
+// // }
 
-    })
+// // getCreditors(false);
 
-}
-
-getClientsDebt();
-
-// // 3. Посчитать сколько неактивных клиентов должны погасить кредит банку и на какую общую сумму. 
-// // 3a. Аналогично для активных. 
-
-//// first variant
+// // second variant
 // function getCreditors(isActiveStatus) {
 //   getCurrencyRates()
 //     .then(currencyRates => {
 //       let clientsDebtsSum = 0;
-//       let totalCreditAccounts = [];
+//       let allCreditAccounts = [];
 //       let allCreditors = {};
 //       Client.clientBase.map(client => {
-//         if(client.isActive === isActiveStatus){
-//           totalCreditAccounts.push(client.creditAccounts);
+//         if (client.isActive === isActiveStatus) {
+//           client.creditAccounts.map(element => {
+//             if (element.creditBalance < element.creditLimit) {
+//               allCreditAccounts.push(element)
+//             }
+//           });
 //         }
+
+
 //       });
-//       let allCreditAccounts = [].concat(...totalCreditAccounts);
-       
-//       for(let i = 0; i < allCreditAccounts.length; i++) {
+
+//       console.log(allCreditAccounts);
+
+
+
+//       for (let i = 0; i < allCreditAccounts.length; i++) {
 //         clientsDebtsSum += (allCreditAccounts[i].creditLimit - allCreditAccounts[i].creditBalance) * currencyRates[allCreditAccounts[i].currencyType] / currencyRates["USD"];
 //       }
-//       allCreditors.CreditorsCount = totalCreditAccounts.length;
+//       allCreditors.CreditorsCount = allCreditAccounts.length;
 //       allCreditors.TotalDebts = clientsDebtsSum;
 
 //       console.log(allCreditors);
@@ -383,39 +433,4 @@ getClientsDebt();
 //     })
 // }
 
-// getCreditors(false);
-
-// second variant
-function getCreditors(isActiveStatus) {
-  getCurrencyRates()
-    .then(currencyRates => {
-      let clientsDebtsSum = 0;
-      let allCreditAccounts = [];
-      let allCreditors = {};
-      Client.clientBase.map(client => {
-        if(client.isActive === isActiveStatus){
-          client.creditAccounts.map(element => { 
-            if(element.creditBalance < element.creditLimit){
-            allCreditAccounts.push(element) }
-          });
-        }
-
-        
-      });
-
-      console.log(allCreditAccounts);
-
-
-      
-      for(let i = 0; i < allCreditAccounts.length; i++) {
-        clientsDebtsSum += (allCreditAccounts[i].creditLimit - allCreditAccounts[i].creditBalance) * currencyRates[allCreditAccounts[i].currencyType] / currencyRates["USD"];
-      }
-      allCreditors.CreditorsCount = allCreditAccounts.length;
-      allCreditors.TotalDebts = clientsDebtsSum;
-
-      console.log(allCreditors);
-      return allCreditors;
-    })
-}
-
-getCreditors(true);
+// getCreditors(true);
