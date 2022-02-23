@@ -79,6 +79,7 @@ function getBankUsdAmount() {
   getCurrencyRates()
     .then(currencyRates => {
       let sumUSD = 0;
+      
       Client.clientBase.map(client => {
         client.accounts.map(account => {
           sumUSD += account.balance * currencyRates[account.currencyType] / currencyRates["USD"];
@@ -92,6 +93,7 @@ function getClientsDebt() {
   getCurrencyRates()
     .then(currencyRates => {
       let debtsSum = 0;
+
       Client.clientBase.map(client => {
         client.accounts.map(account => {
           if(account.accountType === "creditAccount") {
