@@ -124,7 +124,7 @@ function getCreditors(isActiveStatus) {
           });
         }
       });
-
+ 
       for(let i = 0; i < allCreditAccounts.length; i++) {
         clientsDebtsSum += (allCreditAccounts[i].creditLimit - allCreditAccounts[i].creditBalance) * currencyRates[allCreditAccounts[i].currencyType] / currencyRates["USD"];
       }
