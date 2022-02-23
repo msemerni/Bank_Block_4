@@ -63,9 +63,9 @@ class Client {
 
 let misha = new Client("Misha", true, new Date(2011, 0, 1));
 misha.addDebitAccount(1000, new Date(2022, 11, 31), "UAH");
-misha.addDebitAccount(200, new Date(2024, 7, 15), "EUR");
+// misha.addDebitAccount(200, new Date(2024, 7, 15), "EUR");
 
-misha.addCreditAccount(3500, new Date(2025, 8, 5), "UAH");
+// misha.addCreditAccount(3500, new Date(2025, 8, 5), "UAH");
 misha.addCreditAccount(100, new Date(2022, 8, 5), "USD");
 // misha.creditAccounts[1].creditBalance -= 50;
 
@@ -73,8 +73,9 @@ misha.addCreditAccount(100, new Date(2022, 8, 5), "USD");
 
 
 let ira = new Client("Ira", false, new Date(2020, 7, 9));
-ira.addDebitAccount(500, new Date(2022, 5, 20), "USD");
+// ira.addDebitAccount(500, new Date(2022, 5, 20), "USD");
 ira.addCreditAccount(200, new Date(2026, 4, 2), "EUR");
+ira.addCreditAccount(400, new Date(2026, 4, 2), "USD");
 
 // ira.addDebitAccount(600, new Date(2023, 6, 25), "EUR");
 // ira.creditAccounts[0].creditBalance -= 150;
@@ -219,46 +220,90 @@ function getCurrencyRates() {
 /////////////////////////////
 
 ////// second variant
+// function getBankUSDAmount() {
+
+
+//   getCurrencyRates()
+//     .then(currencyUsdRates => {
+//       let sumUSD = 0;
+//       console.log(currencyUsdRates);
+//       Client.clientBase.map(client => {
+
+//         if (client.creditAccounts.length > 0) {
+//           client.creditAccounts.map(creditAccounts => {
+//             sumUSD += ((creditAccounts.creditBalance * currencyUsdRates[creditAccounts.currencyType]) / currencyUsdRates["USD"]);
+//             if(isNaN(sumUSD)) {
+//               throw new Error (`No currency rate for ${creditAccounts.currencyType}`);
+//             }
+//             console.log(sumUSD + " to USD");
+//           });
+//         }
+
+//         if (client.debitAccounts.length > 0) {
+
+//           client.debitAccounts.map(debitAccounts => {
+//             sumUSD += ((debitAccounts.debitBalance * currencyUsdRates[debitAccounts.currencyType]) / currencyUsdRates["USD"]);
+//             if(isNaN(sumUSD)) {
+//               throw new Error (`No currency rate for ${debitAccounts.currencyType}`);
+//             }
+//             console.log(sumUSD + " to USD");
+//           });
+//         }
+
+
+//       })
+
+//       console.log("Total USD in Bank: " + sumUSD);
+//       return sumUSD;
+//     }
+//     )
+// }
+////// third variant
 function getBankUSDAmount() {
-
-
   getCurrencyRates()
-    .then(currencyUsdRates => {
+    .then(currencyRates => {
       let sumUSD = 0;
-      console.log(currencyUsdRates);
+      let totalBankMoney = [];
       Client.clientBase.map(client => {
 
-        if (client.creditAccounts.length > 0) {
-          client.creditAccounts.map(creditAccounts => {
-            sumUSD += ((creditAccounts.creditBalance * currencyUsdRates[creditAccounts.currencyType]) / currencyUsdRates["USD"]);
-            if(isNaN(sumUSD)) {
-              throw new Error (`No currency rate for ${creditAccounts.currencyType}`);
-            }
-            console.log(sumUSD + " to USD");
-          });
-        }
 
-        if (client.debitAccounts.length > 0) {
+        // let misha = new Client("Misha", true, new Date(2011, 0, 1));
+        // misha.addDebitAccount(1000, new Date(2022, 11, 31), "UAH");
+        // misha.addCreditAccount(100, new Date(2022, 8, 5), "USD");
 
-          client.debitAccounts.map(debitAccounts => {
-            sumUSD += ((debitAccounts.debitBalance * currencyUsdRates[debitAccounts.currencyType]) / currencyUsdRates["USD"]);
-            if(isNaN(sumUSD)) {
-              throw new Error (`No currency rate for ${debitAccounts.currencyType}`);
-            }
-            console.log(sumUSD + " to USD");
-          });
-        }
+        // let ira = new Client("Ira", false, new Date(2020, 7, 9));
+        // ira.addCreditAccount(200, new Date(2026, 4, 2), "EUR");
+        // ira.addCreditAccount(400, new Date(2026, 4, 2), "USD");
 
 
-      })
+
+        totalBankMoney.push(client.creditAccounts, client.debitAccounts);
+        // totalBankMoney.push(client.debitAccounts);
+        // totalBankMoney.push(client.debitAccounts);
+        console.log(totalBankMoney);
+
+      });
+
+      let allBankMoney = [].concat(...totalBankMoney);
+
+      console.log("___");
+      console.log(allBankMoney);
+
+      for (let i = 0; i < allBankMoney.length; i++) {
+
+        sumUSD += allBankMoney[i].creditBalance * currencyRates[allBankMoney[i].currencyType] / currencyRates["USD"] ||
+          allBankMoney[i].debitBalance * currencyRates[allBankMoney[i].currencyType] / currencyRates["USD"];
+
+      }
+
+      // sumUSD += allBankMoney.forEach(((creditBalance * currencyRates[currencyType]) / currencyRates["USD"]));
+
 
       console.log("Total USD in Bank: " + sumUSD);
       return sumUSD;
-    }
-    )
+    })
 }
 
+getBankUSDAmount();
 
-let dd = getBankUSDAmount();
-console.log(dd + " UAH to USD444");
 

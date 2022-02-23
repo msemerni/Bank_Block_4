@@ -60,15 +60,15 @@ class Client {
   }
 }
 
-// let misha = new Client("Misha", true, new Date(2011, 0, 1));
-// misha.addDebitAccount(1000, new Date(2022, 11, 31), "UAH");
-// misha.addDebitAccount(200, new Date(2024, 7, 15), "EUR");
-// misha.addCreditAccount(3500, new Date(2025, 8, 5), "UAH");
-// misha.addCreditAccount(100, new Date(2022, 8, 5), "USD");
+let misha = new Client("Misha", true, new Date(2011, 0, 1));
+misha.addDebitAccount(1000, new Date(2022, 11, 31), "UAH");
+misha.addDebitAccount(200, new Date(2024, 7, 15), "EUR");
+misha.addCreditAccount(3500, new Date(2025, 8, 5), "UAH");
+misha.addCreditAccount(100, new Date(2022, 8, 5), "USD");
 
-// let ira = new Client("Ira", false, new Date(2020, 7, 9));
-// ira.addDebitAccount(500, new Date(2022, 5, 20), "USD");
-// ira.addCreditAccount(200, new Date(2026, 4, 2), "EUR");
+let ira = new Client("Ira", false, new Date(2020, 7, 9));
+ira.addDebitAccount(500, new Date(2022, 5, 20), "USD");
+ira.addCreditAccount(200, new Date(2026, 4, 2), "EUR");
 
 function getCurrencyRates() {
   let currencyRates = fetch("https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5")
@@ -89,26 +89,18 @@ function getBankUSDAmount() {
   getCurrencyRates()
     .then(currencyRates => {
       let sumUSD = 0;
+      let totalBankMoney = [];
       Client.clientBase.map(client => {
-        if(client.creditAccounts.length > 0) {
-          client.creditAccounts.map(creditAccounts => {
-            sumUSD += ((creditAccounts.creditBalance * currencyRates[creditAccounts.currencyType]) / currencyRates["USD"]);
-            if(isNaN(sumUSD)) {
-              throw new Error (`No currency rate for ${creditAccounts.currencyType}`);
-            }
-          });
-        }
-
-        if(client.debitAccounts.length > 0) {
-          client.debitAccounts.map(debitAccounts => {
-            sumUSD += ((debitAccounts.debitBalance * currencyRates[debitAccounts.currencyType]) / currencyRates["USD"]);
-            if(isNaN(sumUSD)) {
-              throw new Error (`No currency rate for ${debitAccounts.currencyType}`);
-            }
-          });
-        }
+        totalBankMoney.push(client.creditAccounts, client.debitAccounts);
       });
-      // console.log("Total USD in Bank: " + sumUSD);
+
+      let allBankMoney = [].concat(...totalBankMoney);
+
+      for(let i = 0; i < allBankMoney.length; i++) {
+        sumUSD += allBankMoney[i].creditBalance * currencyRates[allBankMoney[i].currencyType] / currencyRates["USD"] ||
+          allBankMoney[i].debitBalance * currencyRates[allBankMoney[i].currencyType] / currencyRates["USD"];
+      }
+      console.log("Total USD in Bank: " + sumUSD);
       return sumUSD;
     })
 }
