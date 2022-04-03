@@ -1,0 +1,81 @@
+html {
+    box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+box-sizing: inherit;
+}
+
+body {
+    margin: 0;
+    font-size: 16px;
+    /* line-height: 1.5; */
+}
+
+h4 {
+    margin: 5px 0 5px 0;
+    font-size: 18px;
+}
+
+p, span {
+    margin: 0 0 5px 0;
+}
+
+.container {
+    width: 100%;
+    position: relative;
+    overflow: hidden; 
+    min-height: 100vh;
+    padding: 5px;
+}
+
+.row {
+    display: flex;
+    margin: -5px;
+}
+.rowone {
+    flex-wrap: wrap;
+    flex-direction: column;
+    padding: 5px;
+}
+
+.card {
+    display: flex;
+    flex-grow: 1;
+}
+
+.aside {
+    /* flex-direction: column; */
+    background: lightgray;
+    /* flex-grow: 1; */
+    /* min-height: 100vh; */
+    border-radius: 10px;
+    margin: 5px;
+    width: 35%;
+    min-width: 250px;
+}
+
+.usercard {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    background: rgb(218, 245, 143);
+    padding: 10px;
+    margin: 5px;
+    border-radius: 10px;
+}
+
+fieldset {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    margin: 5px;
+    border-radius: 10px;
+    /* flex-direction: column; */
+}
+
+.btn {
+    text-align: center;
+}

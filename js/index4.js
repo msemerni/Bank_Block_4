@@ -33,6 +33,23 @@ class Client {
     this.registrationDate = registrationDate;
     this.accounts = [];
     Client.clientBase.push(this);
+
+    ///*///
+    this.clientCard = document.createElement("div");
+    this.clientCard.classList = "usercard";
+    this.clientCard.innerHTML = `
+    <h4>${this.fullName}</h4>
+    <span>Id: <b>${this.id}</b></span>
+    <span>Active: <b>${this.isActive}</b></span>
+    <span>Date: <b>${this.registrationDate.getFullYear() + '-' + ('0' + (registrationDate.getMonth() + 1)).slice(-2) + '-' + ('0' + registrationDate.getDate()).slice(-2)}</b></span>
+    `;
+    document.getElementById("card").append(this.clientCard);
+
+    this.accountsBox = document.createElement("div");
+    this.accountsBox.id = "accts";
+    this.clientCard.append(this.accountsBox);
+
+    ///**///
   }
 
   addDebitAccount(balance, expiredDate, currencyType) {
@@ -46,6 +63,16 @@ class Client {
       expiredDate: expiredDate,
       currencyType: currencyType,
     })
+    ///*///
+     this.accounts.map(data => {
+      this.accountElem = document.createElement("p");
+      this.accountElem.innerHTML = 
+      `
+      Debit account ${data.currencyType}: ${data.balance} 
+      `
+     });
+    this.accountsBox.append(this.accountElem);
+    ///**///
   }
 
   addCreditAccount(creditLimit, expiredDate, currencyType) {
@@ -60,18 +87,30 @@ class Client {
       expiredDate: expiredDate,
       currencyType: currencyType,
     })
+    ///*///
+    this.accounts.map(data => {
+      this.accountElem = document.createElement("p");
+      this.accountElem.innerHTML =
+      `
+      Credit account ${data.currencyType}: ${data.balance}
+      `
+    });
+    this.accountsBox.append(this.accountElem);
+    ///**///
   }
 }
 
-let misha = new Client("Misha", true, new Date(2011, 0, 1));
+
+
+let misha = new Client("Semernin Misha", true, new Date(2011, 0, 1));
 misha.addDebitAccount(1000, new Date(2022, 11, 31), "UAH");
 misha.addDebitAccount(200, new Date(2024, 7, 15), "EUR");
 misha.addCreditAccount(3500, new Date(2025, 8, 5), "UAH");
 misha.addCreditAccount(100, new Date(2022, 8, 5), "USD");
 misha.accounts[3].balance -= 50;
-misha.isActive = false;
+// misha.isActive = false;
 
-let ira = new Client("Ira", false, new Date(2020, 7, 9));
+let ira = new Client("Ivanova Ira", false, new Date(2020, 7, 9));
 ira.addDebitAccount(500, new Date(2022, 5, 20), "USD");
 ira.addCreditAccount(200, new Date(2026, 4, 2), "EUR");
 ira.accounts[1].balance -= 100;
@@ -80,7 +119,7 @@ console.log(misha);
 console.log(ira);
 console.log(Client.clientBase);
 console.log(misha.accounts[0].currencyType);
-ira.isActive = true;
+// ira.isActive = true;
 // console.log(ira);
 
 function getCurrencyRates() {
@@ -98,11 +137,13 @@ function getCurrencyRates() {
 
       return exchangeRates;
     })
+
   return currencyUsdRates;
 }
 
 
 // //// sixth variant
+// 1. Подсчитать общее количество денег внутри банка в долларовом эквиваленте учитывая кредитные лимиты и снятие средств. 
 function getBankUsdAmount() {
   getCurrencyRates()
     .then(currencyRates => {
@@ -111,14 +152,22 @@ function getBankUsdAmount() {
         sumUSD += account.balance * currencyRates[account.currencyType] / currencyRates["USD"] }) 
       });
       console.log(sumUSD);
+
+      ///*///
+      let rowone = document.getElementById('rowone');
+      let sum = document.createElement("div");
+      sum.innerHTML = `
+      <span>Total money in bank (USD): ${sumUSD}</span>
+      `;
+      rowone.append(sum);
+      ///**///
+
       return sumUSD;
     })
 }
 
-getBankUsdAmount();
-
-
 //// sixth variant
+// 2. Посчитать сколько всего денег в долларовом эквиваленте все клиенты должны банку. 
 function getClientsDebt() {
   getCurrencyRates()
     .then(currencyRates => {
@@ -131,17 +180,27 @@ function getClientsDebt() {
         });
       });
 
-      console.log("Total Debts: " + debtsSum);
+      console.log("Total debt (USD): " + debtsSum);
+
+      ///*///
+      let rowone = document.getElementById('rowone');
+      let debt = document.createElement("div");
+      debt.innerHTML = `
+      <span>Total debt (USD): ${debtsSum}</span>
+      `;
+      rowone.append(debt);
+      ///**///
+
       return debtsSum;
     })
 }
 
-getClientsDebt();
 
+
+// //// sixth variant
 // // // 3. Посчитать сколько неактивных клиентов должны погасить кредит банку и на какую общую сумму. 
 // // // 3a. Аналогично для активных. 
 
-// //// sixth variant
 function getCreditors(isActiveStatus) {
   getCurrencyRates()
     .then(currencyRates => {
@@ -160,13 +219,72 @@ function getCreditors(isActiveStatus) {
       });
 
       console.log(allCreditors);
+
+      ///*///
+      let rowone = document.getElementById('rowone');
+      let clientsDebts = document.createElement("div");
+      if (isActiveStatus) {
+        clientsDebts.innerHTML = `
+        <span>Active ${allCreditors.CreditorsCount} client(s) debt (USD): ${allCreditors.TotalDebts}</span>
+        `;
+      } 
+      if (!isActiveStatus) {
+        clientsDebts.innerHTML = `
+        <span>Not active ${allCreditors.CreditorsCount} client(s) debt (USD): ${allCreditors.TotalDebts}</span>
+        `;
+      }
+      rowone.append(clientsDebts);
+      ///**///
+
       return allCreditors;
     })
 }
 
-getCreditors(true);
+function showBankInfo () {
+  getBankUsdAmount();
+  getClientsDebt();
+  getCreditors(true);
+  getCreditors(false);
+}
 
+showBankInfo();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+///*///
+let clientBox = document.createElement("fieldset");
+clientBox.innerHTML = 
+`
+<fieldset>
+<legend>Add new client</legend>
+<p>
+  <label for="name">Full Name: </label><br>
+  <input type="text" id="name">
+</p>
+<p>
+  <label for="status">Client status:</label><br>
+  <select id="status" name="status">
+    <option value="active">Active</option>
+    <option value="notActive">Not Active</option>
+  </select>
+</p>
+<p>
+  <label for="date">Registration date: </label><br>
+  <input type="date" id="date">
+</p>
+</fieldset>
+`;
+
+
+let btnAddClient = document.createElement("button");
+btnAddClient.classList = "btn";
+btnAddClient.innerText = "Add client";
+clientBox.append(btnAddClient);
+
+document.getElementById("aside").append(clientBox);
+///**///
+
+// // let date = new Date();
+// // let dd = document.getElementById('date');
+// // dd.innerText = date;
