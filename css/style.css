@@ -12,6 +12,7 @@ body {
     margin: 0;
     font-size: 16px;
     /* line-height: 1.5; */
+    background: #000000;
 }
 
 h4 {
@@ -38,12 +39,29 @@ p, span {
 .rowone {
     flex-wrap: wrap;
     flex-direction: column;
+    justify-content: space-between;
     padding: 5px;
+    background: lightgray;
+    margin: 0 0 5px 0;
+    border-radius: 10px;
+    height: 100px;
 }
 
 .card {
     display: flex;
+    flex-wrap: wrap;
     flex-grow: 1;
+    /* justify-content: space-evenly; */
+}
+
+.usercard {
+    display: flex;
+    flex-direction: column;
+    width: 48%;
+    background: #c0cbff;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 10px;
 }
 
 .aside {
@@ -53,18 +71,14 @@ p, span {
     /* min-height: 100vh; */
     border-radius: 10px;
     margin: 5px;
-    width: 35%;
+    /* width: 35%; */
+    height: fit-content;
     min-width: 250px;
+    width: 30%;
 }
 
-.usercard {
-    display: flex;
-    flex-direction: column;
-    width: 50%;
-    background: rgb(218, 245, 143);
-    padding: 10px;
-    margin: 5px;
-    border-radius: 10px;
+form {
+    margin: 0 0 20px 0;
 }
 
 fieldset {
@@ -76,6 +90,20 @@ fieldset {
     /* flex-direction: column; */
 }
 
+input, select {
+    width: 100%;
+}
+
 .btn {
     text-align: center;
+    background: #9083ff;
+    border: none;
+    border-radius: 10px;
+    padding: 5px;
 }
+
+.btn:hover {
+    background: #6e51ec;
+    font-weight: 600;
+}
+

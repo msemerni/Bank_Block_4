@@ -33,23 +33,6 @@ class Client {
     this.registrationDate = registrationDate;
     this.accounts = [];
     Client.clientBase.push(this);
-
-    ///*///
-    this.clientCard = document.createElement("div");
-    this.clientCard.classList = "usercard";
-    this.clientCard.innerHTML = `
-    <h4>${this.fullName}</h4>
-    <span>Id: <b>${this.id}</b></span>
-    <span>Active: <b>${this.isActive}</b></span>
-    <span>Date: <b>${('0' + this.registrationDate.getDate()).slice(-2) + '-' + ('0' + (this.registrationDate.getMonth() + 1)).slice(-2) + '-' + this.registrationDate.getFullYear() }</b></span>
-    `;
-    document.getElementById("card").append(this.clientCard);
-
-    this.accountsBox = document.createElement("div");
-    this.accountsBox.id = "accts";
-    this.clientCard.append(this.accountsBox);
-
-    ///**///
   }
 
   addDebitAccount(balance, expiredDate, currencyType) {
@@ -63,16 +46,7 @@ class Client {
       expiredDate: expiredDate,
       currencyType: currencyType,
     })
-    ///*///
-     this.accounts.map(data => {
-      this.accountElem = document.createElement("p");
-      this.accountElem.innerHTML = 
-      `
-      Debit account ${data.currencyType}: <b>${data.balance}</b> 
-      `
-     });
-    this.accountsBox.append(this.accountElem);
-    ///**///
+
   }
 
   addCreditAccount(creditLimit, expiredDate, currencyType) {
@@ -87,16 +61,6 @@ class Client {
       expiredDate: expiredDate,
       currencyType: currencyType,
     })
-    ///*///
-    this.accounts.map(data => {
-      this.accountElem = document.createElement("p");
-      this.accountElem.innerHTML =
-      `
-      Credit account ${data.currencyType}: <b>${data.balance}</b>
-      `
-    });
-    this.accountsBox.append(this.accountElem);
-    ///**///
   }
 }
 
@@ -240,7 +204,9 @@ function getCreditors(isActiveStatus) {
     })
 }
 
-function showBankInfo () {
+function showBankInfo() {
+  let rowone = document.getElementById('rowone');
+  rowone.innerHTML = ""
   getBankUsdAmount();
   getClientsDebt();
   getCreditors(true);
@@ -248,9 +214,44 @@ function showBankInfo () {
 }
 
 showBankInfo();
+renderAllClients();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function renderAllClients() {
+  let cardBox = document.getElementById("card");
+  cardBox.innerHTML = "";
+
+  Client.clientBase.map(client => {
+
+    let clientCard = document.createElement("div");
+    clientCard.classList = "usercard";
+    clientCard.innerHTML = `
+    <h4>${client.fullName}</h4>
+    <span>Id: <b>${client.id}</b></span>
+    <span>Active: <b>${client.isActive}</b></span>
+    <span>Date: <b>${('0' + client.registrationDate.getDate()).slice(-2) + '-' + ('0' + (client.registrationDate.getMonth() + 1)).slice(-2) + '-' + client.registrationDate.getFullYear()}</b></span>
+    
+    `;
+    cardBox.append(clientCard);
+
+    let accountsBox = document.createElement("div");
+    accountsBox.id = "accts";
+    clientCard.append(accountsBox);
+    ////
+    client.accounts.map(data => {
+      let accountElem = document.createElement("p");
+      accountElem.innerHTML =
+        `
+        Debit account ${data.currencyType}: <b>${data.balance}</b> 
+          `
+      accountsBox.append(accountElem);
+    });
+
+  })
+}
+
 
 ///*///
 function addNewClient() {
@@ -265,108 +266,125 @@ function addNewClient() {
     clientStatus = false;
   }
 
-  if (dateReg.valueAsDate === null) {
+  if (fullName.value === "") {
+    alert("Add name");
+  } 
+  else if (dateReg.valueAsDate === null){
     alert("Add registration date");
-  }else {
-  
-  new Client(fullName.value, clientStatus, dateReg.valueAsDate);
-  console.log(Client.clientBase);
-  document.getElementById("clientBoxForm").reset();
+  } else {
+    new Client(fullName.value, clientStatus, dateReg.valueAsDate);
+    console.log(Client.clientBase);
+    document.getElementById("clientBoxForm").reset();
+    renderAllClients();
+    renderOptionDeleteClientBox();
+    showBankInfo();
   }
-  // fullName.value = "";
-  // status.value = "";
-  // dateReg.value = "";
-
-  // alert("New client added");
 }
 
 function deleteClient() {
-  let fullNameToDelete = document.getElementById("nameToDelete").value;
+
+  let fullNameToDelete = document.getElementById("txtAutoComplete").value;
 
   let index = Client.clientBase.findIndex((client) => client.fullName === fullNameToDelete);
-
   if (index >= 0) {
-    Client.clientBase.splice(index, 1);
-    alert(fullNameToDelete + " deleted");
+    let confirmation = confirm("Are you sure?");
+    if (confirmation) {
+      Client.clientBase.splice(index, 1);
+      console.log(Client.clientBase);
+      renderAllClients();
+      renderOptionDeleteClientBox();
+      showBankInfo();
+      // alert(fullNameToDelete + " deleted");
+    }
   } else {
-  alert(fullNameToDelete + " not found");
+    alert(fullNameToDelete + " not found");
   }
-
-
-  // let rr = document.getElementById("card").removeChild(this.clientCard);
-  // let rr = document.getElementById("card");
-  // let cardToDelete = document.querySelectorAll(".usercard");
-  // console.log(cardToDelete);
-  // console.log(rr);
-
-
-  console.log(Client.clientBase);
+  document.getElementById("deleteClientBoxForm").reset();
 }
 
-//// 1
-let clientBoxForm = document.createElement("form");
-clientBoxForm.id = "clientBoxForm";
-let clientBox = document.createElement("fieldset");
-clientBox.id = "clientBox";
-clientBox.innerHTML = 
-`
-<legend>Add new client</legend>
-<p>
-  <label for="name">Full Name: </label><br>
-  <input type="text" id="name">
-</p>
-<p>
-  <label for="status">Client status:</label><br>
-  <select id="status" name="status">
-    <option value="active">Active</option>
-    <option value="notActive">Not Active</option>
-  </select>
-</p>
-<p>
-  <label for="dateReg">Registration date: </label><br>
-  <input type="date" id="dateReg">
-</p>
-`;
 
-let btnAddClient = document.createElement("button");
-btnAddClient.classList = "btn";
-btnAddClient.innerText = "Add client";
-clientBox.append(btnAddClient);
-document.getElementById("aside").append(clientBoxForm);
-document.getElementById("clientBoxForm").append(clientBox);
+function renderAddClientBox() {
+  //// 1
+  let clientBoxForm = document.createElement("form");
+  clientBoxForm.id = "clientBoxForm";
+  let clientBox = document.createElement("fieldset");
+  clientBox.id = "clientBox";
+  clientBox.innerHTML =
+  `
+  <legend><b>Add client</b></legend>
+  <p>
+    <label for="name">Full Name: </label><br>
+    <input type="text" id="name">
+  </p>
+  <p>
+    <label for="status">Client status:</label><br>
+    <select id="status" name="status">
+      <option value="active">Active</option>
+      <option value="notActive">Not Active</option>
+    </select>
+  </p>
+  <p>
+    <label for="dateReg">Registration date: </label><br>
+    <input type="date" id="dateReg">
+  </p>
+  `;
 
-btnAddClient.addEventListener("click", (event) => {
-  event.preventDefault();
-  addNewClient();
-});
+  let btnAddClient = document.createElement("button");
+  btnAddClient.classList = "btn";
+  btnAddClient.innerText = "Add client";
+  clientBox.append(btnAddClient);
+  document.getElementById("aside").append(clientBoxForm);
+  document.getElementById("clientBoxForm").append(clientBox);
 
-//// 2
-let deleteClientBoxForm = document.createElement("form");
-deleteClientBoxForm.id = "deleteClientBoxForm";
-let deleteClientBox = document.createElement("fieldset");
-deleteClientBox.id = "deleteClientBox";
-deleteClientBox.innerHTML = 
-`
-<legend>Delete client</legend>
-<p>
-  <label for="name">Full Name: </label><br>
-  <input type="text" id="nameToDelete">
-</p>
-`;
+  btnAddClient.addEventListener("click", (event) => {
+    event.preventDefault();
+    addNewClient();
+    renderOptionDeleteClientBox();
+  });
+}
 
-let btnDeleteClient = document.createElement("button");
-btnDeleteClient.classList = "btn";
-btnDeleteClient.innerText = "Delete client";
-deleteClientBox.append(btnDeleteClient);
+  renderAddClientBox();
+  //// 2
+  
+  let deleteClientBoxForm = document.createElement("form");
+  deleteClientBoxForm.id = "deleteClientBoxForm";
+  deleteClientBoxForm.innerHTML = "";
 
+  let deleteClientBox = document.createElement("fieldset");
+  deleteClientBox.id = "deleteClientBox";
+  deleteClientBox.innerHTML =
+  `
+  <legend><b>Delete client</b></legend>
+  <p>
+    <input type="text" id="txtAutoComplete" list="clientList" />
+    <datalist id="clientList"></datalist>
+  </p>
+  `;
 
-document.getElementById("aside").append(deleteClientBoxForm);
-document.getElementById("deleteClientBoxForm").append(deleteClientBox);
+  document.getElementById("aside").append(deleteClientBoxForm);
+  document.getElementById("deleteClientBoxForm").append(deleteClientBox);
 
-btnDeleteClient.addEventListener("click", (event) => {
-  event.preventDefault();
-  deleteClient();
-});
+  let btnDeleteClient = document.createElement("button");
+  btnDeleteClient.classList = "btn";
+  btnDeleteClient.innerText = "Delete client";
+  deleteClientBox.append(btnDeleteClient);
 
+  btnDeleteClient.addEventListener("click", (event) => {
+    event.preventDefault();
+    deleteClient();
+    renderOptionDeleteClientBox();
+  });
+
+function renderOptionDeleteClientBox() {
+  let clientList = document.getElementById("clientList");
+  clientList.innerHTML = "";
+  Client.clientBase.map(client => {
+    let optionClientList = document.createElement("option");
+    optionClientList.value = client.fullName;
+    clientList.append(optionClientList);
+  })
+}
 ///**///
 
+
+renderOptionDeleteClientBox();
