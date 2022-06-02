@@ -282,7 +282,6 @@ function addNewClient() {
 }
 
 function deleteClient() {
-
   let fullNameToDelete = document.getElementById("txtAutoComplete").value;
 
   let index = Client.clientBase.findIndex((client) => client.fullName === fullNameToDelete);
