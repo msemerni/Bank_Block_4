@@ -1,109 +1,118 @@
 html {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
-*,
-*::before,
-*::after {
-box-sizing: inherit;
+*, *::before, *::after {
+  box-sizing: inherit;
 }
 
 body {
-    margin: 0;
-    font-size: 16px;
-    /* line-height: 1.5; */
-    background: #000000;
+  margin: 0;
+  font-size: 16px;
+  background: #505050;
+}
+
+h1, h4 {
+  margin: 5px 0 5px 0;
 }
 
 h4 {
-    margin: 5px 0 5px 0;
-    font-size: 18px;
+  font-size: 18px;
 }
 
 p, span {
-    margin: 0 0 5px 0;
+  margin: 0 0 5px 0;
 }
 
 .container {
-    width: 100%;
-    position: relative;
-    overflow: hidden; 
-    min-height: 100vh;
-    padding: 5px;
+  width: 100%;
+  min-width: 540px;
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  padding: 5px;
+}
+
+.header {
+  color: #9083ff;
+  text-align: center;
 }
 
 .row {
-    display: flex;
-    margin: -5px;
+  display: flex;
+  margin: -5px;
 }
+
 .rowone {
-    flex-wrap: wrap;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 5px;
-    background: lightgray;
-    margin: 0 0 5px 0;
-    border-radius: 10px;
-    height: 100px;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 5px;
+  background: #d3d3d3;
+  margin: 0 0 5px 0;
+  border-radius: 10px;
+  height: 100px;
 }
 
 .card {
-    display: flex;
-    flex-wrap: wrap;
-    flex-grow: 1;
-    /* justify-content: space-evenly; */
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  height: fit-content;
 }
 
 .usercard {
-    display: flex;
-    flex-direction: column;
-    width: 48%;
-    background: #c0cbff;
-    padding: 10px;
-    margin: 5px;
-    border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+  max-width: 250px;
+  min-height: 250px;
+  flex-grow: 1;
+  background: #c0cbff;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 10px;
 }
 
 .aside {
-    /* flex-direction: column; */
-    background: lightgray;
-    /* flex-grow: 1; */
-    /* min-height: 100vh; */
-    border-radius: 10px;
-    margin: 5px;
-    /* width: 35%; */
-    height: fit-content;
-    min-width: 250px;
-    width: 30%;
+  background: #d3d3d3;
+  border-radius: 10px;
+  margin: 5px;
+  width: 250px;
+  height: fit-content;
+  min-width: 250px;
 }
 
 form {
-    margin: 0 0 20px 0;
+  margin: 0 0 20px 0;
 }
 
 fieldset {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    margin: 5px;
-    border-radius: 10px;
-    /* flex-direction: column; */
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  margin: 5px;
+  border-radius: 10px;
 }
 
 input, select {
-    width: 100%;
+  width: 100%;
+}
+
+label {
+  font-size: 14px;
+  color: #5c5c5c;
 }
 
 .btn {
-    text-align: center;
-    background: #9083ff;
-    border: none;
-    border-radius: 10px;
-    padding: 5px;
+  text-align: center;
+  background: #9083ff;
+  border: none;
+  border-radius: 10px;
+  padding: 5px;
 }
 
 .btn:hover {
-    background: #6e51ec;
-    font-weight: 600;
+  background: #6e51ec;
+  font-weight: 600;
 }
-
