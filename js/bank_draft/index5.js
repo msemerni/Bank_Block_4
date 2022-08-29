@@ -96,10 +96,10 @@ function getCurrencyRates() {
         console.log(exchangeRates);
       }
       exchangeRates["UAH"] = 1;
-
+      console.log("exchangeRates: ",exchangeRates);
       return exchangeRates;
     })
-
+  console.log("currencyUsdRates: ",currencyUsdRates);
   return currencyUsdRates;
 }
 
